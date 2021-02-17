@@ -1,69 +1,89 @@
 <html>
-    <head>
-      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="chessboardjs-1/js/chessboard-1.0.0.js"></script>
     <script src="fetcher.js"></script>
-    </head>
-        <link rel="stylesheet" href="chessboardjs-1/css/chessboard-1.0.0.min.css">
-    <body>
-      <div id="board" style="width: 400px"></div>
-      <p>Einfach ziehen und warten...</p>
-      <!-- <input type="text" id="input_move"/>
-      <button id="moveBtn">Los!</button> -->
-      <p id="last_time"></p>
-      <p id="last_move"></p>
-    </body>
-    <!-- <script src="jquery.min.js"></script> -->
-    
-    <script type="text/javascript">
-      var turn = true;
+    <style>
+        .content {
+            max-width: 500px;
+            margin: auto;
+        }
+    </style>
+</head>
+<link rel="stylesheet" href="chessboardjs-1/css/chessboard-1.0.0.min.css">
 
-      function onDrop (source, target, piece, newPos, oldPos, orientation) {
+<body>
+    <div class="content">
+        <div id="board" style="width: 400px"></div>
+        <p>Einfach ziehen und warten...</p>
+        <!-- <input type="text" id="input_move"/>
+        <button id="moveBtn">Los!</button> -->
+        <p id="last_time"></p>
+        <p id="last_move"></p>
+        <p id="player_turn"></p>
+    </div>
+
+</body>
+<!-- <script src="jquery.min.js"></script> -->
+
+<script type="text/javascript">
+    var turn = true;
+
+    function updatePlayerTurn() {
+        $("#player_turn").text(turn ? "Weiß am Zug" : "Schwarz am Zug")
+    }
+
+    function onDrop(source, target, piece, newPos, oldPos, orientation) {
         console.log('Source: ' + source)
         console.log('Target: ' + target)
-        console.log('Piece: ' + piece)
+        lconsole.log('Piece: ' + piece)
         console.log('New position: ' + Chessboard.objToFen(newPos))
         console.log('Old position: ' + Chessboard.objToFen(oldPos))
         console.log('Orientation: ' + orientation)
         console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+        if (source == target) {
+            return;
+        }
         board.move(source + "-" + target)
         turn = !turn
+        updatePlayerTurn()
         performAiMove()
-      }
+    }
 
-      var board = Chessboard('board', {
+    var board = Chessboard('board', {
         draggable: true,
         dropOffBoard: 'trash',
         // sparePieces: true
-        position: 'start',//'4rkr1/1p1Rn1pp/p3pQ2/5p2/8/8/PPq2PPP/3R2K1 b - - 1 1'
-        onDrop:onDrop
-      })
+        position: 'start', //'4rkr1/1p1Rn1pp/p3pQ2/5p2/8/8/PPq2PPP/3R2K1 b - - 1 1'
+        onDrop: onDrop
+    })
 
-      function turnChar(){
+    function turnChar() {
         return turn ? " w KQkq - 0 1" : " b KQkq - 0 1";
-      }
+    }
 
-      function performAiMove(){
+    function performAiMove() {
         let currentFen = board.fen() + turnChar();
-      getNewFEN(currentFen,(data)=>{
-        turn = !turn
-        board.position(data.updatedFEN)
-        console.log("time:" + data.calculationTimeInSeconds)
-        $("#last_time").text("Letzte Antwortzeit: " + Math.round(data.calculationTimeInSeconds) + " Sekunden")
-        console.log(data.move)
-        $("#last_move").text("Letzter Zug: " + data.move)
-     });
-      }
+        getNewFEN(currentFen, (data) => {
+            turn = !turn
+            updatePlayerTurn()
+            board.position(data.updatedFEN)
+            console.log("time:" + data.calculationTimeInSeconds)
+            $("#last_time").text("Letzte Antwortzeit: " + Math.round(data.calculationTimeInSeconds) + " Sekunden")
+            console.log(data.move)
+            $("#last_move").text("Letzter Zug: " + data.move)
+        });
+    }
 
-      
-  //   $('#moveBtn').on('click', function () {
-  //     board.move($('#input_move').val())
-  //     $('loading_text').text("Lädt...")
-  //     turn = !turn
-  //     performAiMove()
-  //     $('loading_text').text("")
-  // })
-  
-      
-    </script>
+
+    //   $('#moveBtn').on('click', function () {
+    //     board.move($('#input_move').val())
+    //     $('loading_text').text("Lädt...")
+    //     turn = !turn
+    //     performAiMove()
+    //     $('loading_text').text("")
+    // })
+</script>
+
 </html>
