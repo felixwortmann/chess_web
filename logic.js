@@ -49,7 +49,7 @@ async function performAiMove() {
         try {
             data = await (await getNewFEN(currentFen)).json()
             if (data == undefined) {
-                currentTries += 1
+                currentTries++
                 $("#error_text").text("Zug wird gesucht... Versuch: " + currentTries)
                 return;
             }
@@ -57,7 +57,7 @@ async function performAiMove() {
             $("#error_text").text("")
         } catch (e) {
             console.log(e)
-            currentTries += 1
+            currentTries++
             $("#error_text").text("Zug wird gesucht... Versuch: " + currentTries)
         }
 
@@ -69,9 +69,7 @@ async function performAiMove() {
         turn = !turn
         updatePlayerTurn()
         board.position(data.updatedFEN)
-        console.log("time:" + data.calculationTimeInSeconds)
         $("#last_time").text("Letzte Antwortzeit: " + Math.round(data.calculationTimeInSeconds) + " Sekunden")
-        console.log(data.move)
         $("#last_move_and_value").text("Letzter Zug: " + data.move + " (" + data.value + ")")
     }
 
@@ -80,10 +78,8 @@ async function performAiMove() {
 
 function castle(kingside) {
     if (kingside) {
-        console.log("Castle Kingside")
         board.move("e1-g1", "h1-f1")
     } else {
-        console.log("Castle Queenside")
         board.move("e1-c1", "a1-d1")
     }
     turn = !turn
