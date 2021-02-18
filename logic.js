@@ -34,12 +34,12 @@ var board = Chessboard('board', {
     onDrop: onDrop
 })
 
-function turnChar() {
+function fenSuffix() {
     return turn ? " w KQkq - 0 1" : " b KQkq - 0 1";
 }
 
 async function performAiMove() {
-    let currentFen = board.fen() + turnChar();
+    let currentFen = board.fen() + fenSuffix();
     let successful = false
     let maxTries = 6
     var currentTries = 1
