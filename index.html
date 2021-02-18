@@ -16,11 +16,9 @@
 <body>
     <div class="content">
         <div id="board" style="width: 400px"></div>
-        <p>Einfach ziehen und warten...</p>
-        <!-- <input type="text" id="input_move"/>
-        <button id="moveBtn">Los!</button> -->
+        <p id="error_text"></p>
         <p id="last_time"></p>
-        <p id="last_move"></p>
+        <p id="last_move_and_value"></p>
         <p id="player_turn"></p>
         <button id="castle_queenside_button">Rochade links</button>
         <button id="castle_kingside_button">Rochade rechts</button>
@@ -33,7 +31,7 @@
     var turn = true;
 
     function updatePlayerTurn() {
-        $("#player_turn").text(turn ? "Weiß am Zug" : "Schwarz am Zug, bitte warten")
+        $("#player_turn").text(turn ? "Weiß am Zug" : "Schwarz am Zug, bitte warten...")
     }
 
     function onDrop(source, target, piece, newPos, oldPos, orientation) {
@@ -70,17 +68,44 @@
         return turn ? " w KQkq - 0 1" : " b KQkq - 0 1";
     }
 
-    function performAiMove() {
+    async function performAiMove() {
         let currentFen = board.fen() + turnChar();
-        getNewFEN(currentFen, (data) => {
+        let successful = false
+        let maxTries = 6
+        var currentTries = 1
+        var data;
+
+        while (!successful && currentTries < maxTries) {
+            try {
+                data = await (await getNewFEN(currentFen)).json()
+                if (data == undefined) {
+                    currentTries += 1
+                    $("#error_text").text("Zug wird gesucht... Versuch: " + currentTries)
+                    return;
+                }
+                successful = true
+                $("#error_text").text("")
+            } catch (e) {
+                console.log(e)
+                currentTries += 1
+                $("#error_text").text("Zug wird gesucht... Versuch: " + currentTries)
+            }
+
+        }
+        if (!successful) {
+            $("#error_text").text("Ein Fehler ist aufgetreten, es konnte kein Zug gefunden werden :(")
+
+        } else {
             turn = !turn
             updatePlayerTurn()
             board.position(data.updatedFEN)
             console.log("time:" + data.calculationTimeInSeconds)
             $("#last_time").text("Letzte Antwortzeit: " + Math.round(data.calculationTimeInSeconds) + " Sekunden")
             console.log(data.move)
-            $("#last_move").text("Letzter Zug: " + data.move)
-        });
+            $("#last_move_and_value").text("Letzter Zug: " + data.move + " (" + data.value + ")")
+        }
+
+
     }
 
     function castle(kingside) {
