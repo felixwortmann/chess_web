@@ -22,6 +22,8 @@
         <p id="last_time"></p>
         <p id="last_move"></p>
         <p id="player_turn"></p>
+        <button id="castle_queenside_button">Rochade links</button>
+        <button id="castle_kingside_button">Rochade rechts</button>
     </div>
 
 </body>
@@ -76,14 +78,21 @@
         });
     }
 
+    function castle(kingside) {
+        if (kingside) {
+            console.log("Castle Kingside")
+            board.move("e1-g1", "h1-f1")
+        } else {
+            console.log("Castle Queenside")
+            board.move("e1-c1", "a1-d1")
+        }
+        turn = !turn
+        updatePlayerTurn()
+        performAiMove()
+    }
 
-    //   $('#moveBtn').on('click', function () {
-    //     board.move($('#input_move').val())
-    //     $('loading_text').text("Lädt...")
-    //     turn = !turn
-    //     performAiMove()
-    //     $('loading_text').text("")
-    // })
+    $("#castle_kingside_button").on("click", () => castle(true))
+    $("#castle_queenside_button").on("click", () => castle(false))
 </script>
 
 </html>
