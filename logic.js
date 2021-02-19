@@ -44,7 +44,7 @@ function sleep(ms) {
 
 $($("#try_again_button")).on("click", () => {
     showError(false)
-    performAiMove()
+    performAiMove(3)
 })
 
 function showError(show) {
@@ -52,13 +52,15 @@ function showError(show) {
 }
 
 
-async function performAiMove() {
+
+
+async function performAiMove(depth = 4) {
     let currentFen = board.fen() + fenSuffix();
     let successful = false
     var data;
 
     try {
-        data = await (await getNewFEN(currentFen)).json()
+        data = await (await getNewFEN(currentFen, depth)).json()
         successful = true
     } catch (e) {
         console.log(e)
