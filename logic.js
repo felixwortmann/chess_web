@@ -38,33 +38,34 @@ function fenSuffix() {
     return turn ? " w KQkq - 0 1" : " b KQkq - 0 1";
 }
 
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+$($("#try_again_button")).on("click", () => {
+    showError(false)
+    performAiMove()
+})
+
+function showError(show) {
+    $("#try_again_button").toggle(show)
+}
+
+
 async function performAiMove() {
     let currentFen = board.fen() + fenSuffix();
     let successful = false
-    let maxTries = 6
-    var currentTries = 1
     var data;
 
-    while (!successful && currentTries < maxTries) {
-        try {
-            data = await (await getNewFEN(currentFen)).json()
-            if (data == undefined) {
-                currentTries++
-                $("#error_text").text("Zug wird gesucht... Versuch: " + currentTries)
-                return;
-            }
-            successful = true
-            $("#error_text").text("")
-        } catch (e) {
-            console.log(e)
-            currentTries++
-            $("#error_text").text("Zug wird gesucht... Versuch: " + currentTries)
-        }
-
+    try {
+        data = await (await getNewFEN(currentFen)).json()
+        successful = true
+    } catch (e) {
+        console.log(e)
     }
-    if (!successful) {
-        $("#error_text").text("Ein Fehler ist aufgetreten, es konnte kein Zug gefunden werden :(")
 
+    if (!successful) {
+        showError(true)
     } else {
         turn = !turn
         updatePlayerTurn()
@@ -87,5 +88,5 @@ function castle(kingside) {
     performAiMove()
 }
 
-$("#castle_kingside_button").on("click", () => castle(true))
-$("#castle_queenside_button").on("click", () => castle(false))
+$("#castle_kingside_button").on("click", () => castle(true));
+$("#castle_queenside_button").on("click", () => castle(false));
