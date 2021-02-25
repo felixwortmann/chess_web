@@ -6,6 +6,7 @@
  */
 
 var turn = true;
+const DEFAULT_AI_DEPTH = 4
 
 function updatePlayerTurn() {
     $("#player_turn").text(turn ? "Weiß am Zug" : "Schwarz am Zug, bitte warten...")
@@ -54,13 +55,13 @@ function showError(show) {
 
 
 
-async function performAiMove(depth = 4) {
+async function performAiMove(aiDepth = DEFAULT_AI_DEPTH) {
     let currentFen = board.fen() + fenSuffix();
     let successful = false
     var data;
 
     try {
-        data = await (await getNewFEN(currentFen, depth)).json()
+        data = await (await getNewFEN(currentFen, aiDepth)).json()
         successful = true
     } catch (e) {
         console.log(e)
@@ -86,6 +87,8 @@ function castle(kingside) {
         board.move("e1-c1", "a1-d1")
     }
     turn = !turn
+    $("#castle_kingside_button").hide()
+    $("#castle_queenside_button").hide()
     updatePlayerTurn()
     performAiMove()
 }

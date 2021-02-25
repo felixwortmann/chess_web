@@ -1,7 +1,7 @@
-function getNewFEN(fen, depth = 4) {
+function getNewFEN(fen, aiDepth) {
     var formdata = new FormData();
     formdata.append("fen", fen);
-    formdata.append("depth", depth)
+    formdata.append("depth", aiDepth)
 
     var headers = new Headers({
         'Access-Control-Allow-Origin': 'https://chess-ai-api.herokuapp.com/nextmove'
