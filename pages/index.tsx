@@ -1,12 +1,8 @@
-import type { NextPage } from "next";
-import Head from "next/head";
-import Image from "next/image";
-import { useState } from "react";
-import styles from "../styles/Home.module.css";
-import { Chessboard } from "react-chessboard";
 import { Chess, ChessInstance, Square } from "chess.js";
+import type { NextPage } from "next";
+import { useState } from "react";
+import { Chessboard } from "react-chessboard";
 import getNewFEN from "../lib/fetcher";
-import { finished } from "stream/promises";
 
 const DEFAULT_GAME_DETPH = 4;
 
@@ -68,13 +64,16 @@ const Home: NextPage = () => {
     return false;
   };
 
-  return <>
-    <Chessboard position={game.fen()} onPieceDrop={onDrop}></Chessboard>
+  return <div className="flex-col text-center">
+    <div className="flex justify-center">
+      <Chessboard position={game.fen()} onPieceDrop={onDrop}></Chessboard>
+    </div>
+    <br></br>
     <p>{loading ? "Calculating..." : "Make your move"}</p>
     {error && <>
       <p>An error occured, please try again</p>
       <button onClick={initOpponentMove}>Try again</button></>}
-  </>
+  </div>
 };
 
 export default Home;
