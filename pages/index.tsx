@@ -13,6 +13,8 @@ const DEFAULT_GAME_DETPH = 4;
 const Home: NextPage = () => {
   const [game, setGame] = useState(new Chess());
   const [isPlayerMove, setIsPlayerMove] = useState(true);
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(false)
 
   function safeGameMutate(modify: Function) {
     setGame((g) => {
@@ -24,6 +26,7 @@ const Home: NextPage = () => {
 
   const initOpponentMove = async () => {
     let successful = false
+    setLoading(true)
     for (let i = DEFAULT_GAME_DETPH; i > 0; i--) {
       console.log("requesting...")
       try {
@@ -37,12 +40,18 @@ const Home: NextPage = () => {
       }
     }
     if (successful) {
+      setLoading(false)
       setIsPlayerMove(true);
+      setError(false)
+    } else {
+      setError(true)
     }
-    //todo write else
   };
 
   const onDrop = (sourceSquare: Square, targetSquare: Square) => {
+    if (!isPlayerMove) {
+      return false
+    }
     let move = null;
     safeGameMutate((game: ChessInstance) => {
       move = game.move({
@@ -59,7 +68,13 @@ const Home: NextPage = () => {
     return false;
   };
 
-  return <Chessboard position={game.fen()} onPieceDrop={onDrop}></Chessboard>;
+  return <>
+    <Chessboard position={game.fen()} onPieceDrop={onDrop}></Chessboard>
+    <p>{loading ? "Calculating..." : "Make your move"}</p>
+    {error && <>
+      <p>An error occured, please try again</p>
+      <button onClick={initOpponentMove}>Try again</button></>}
+  </>
 };
 
 export default Home;
