@@ -1,4 +1,4 @@
-# [chess_web](https://chess-web-ui.herokuapp.com)
+# [chess_web](https://chess-web-ui.vercel.app/)
 Web UI for [chess](https://github.com/felixwortmann/chess)<br>
-Play [here](https://chess-web-ui.herokuapp.com)
+Play [here](https://chess-web-ui.vercel.app/)
 
