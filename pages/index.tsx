@@ -2,7 +2,7 @@ import { Chess, ChessInstance, Square } from "chess.js";
 import type { NextPage } from "next";
 import { useState } from "react";
 import { Chessboard } from "react-chessboard";
-import getNewFEN from "../lib/fetcher";
+import requestMove from "../lib/fetcher";
 
 const DEFAULT_GAME_DETPH = 4;
 
@@ -11,6 +11,7 @@ const Home: NextPage = () => {
   const [isPlayerMove, setIsPlayerMove] = useState(true);
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(false)
+  const [moveLog, setMoveLog] = useState<string[]>([])
 
   function safeGameMutate(modify: Function) {
     setGame((g) => {
@@ -20,16 +21,20 @@ const Home: NextPage = () => {
     });
   }
 
+  const appendMoveToLog = (playerMove: boolean, move: string) => {
+    setMoveLog(moveLog => [...moveLog, playerMove ? "Player: " + move : "AI: " + move])
+  }
+
   const initOpponentMove = async () => {
     let successful = false
     setLoading(true)
     for (let i = DEFAULT_GAME_DETPH; i > 0; i--) {
-      console.log("requesting...")
       try {
-        const updatedFEN = await getNewFEN(game.fen(), i);
-        setGame(new Chess(updatedFEN))
+        const serverResponse = await requestMove(game.fen(), i)
+        const newFEN = serverResponse.updatedFEN;
+        setGame(new Chess(newFEN))
         successful = true
-        console.log("finished!")
+        appendMoveToLog(false, serverResponse.move)
         break;
       } catch (e) {
         console.log(e)
@@ -39,6 +44,7 @@ const Home: NextPage = () => {
       setLoading(false)
       setIsPlayerMove(true);
       setError(false)
+      appendMoveToLog
     } else {
       setError(true)
     }
@@ -58,21 +64,33 @@ const Home: NextPage = () => {
     });
     if (move !== null) {
       setIsPlayerMove(false);
+      appendMoveToLog(true, sourceSquare + targetSquare)
       initOpponentMove();
       return true;
     }
     return false;
   };
 
-  return <div className="flex-col text-center">
-    <div className="flex justify-center">
+  return <div className="flex-col justify-center text-center">
+    <div className="flex justify-center my-5">
       <Chessboard position={game.fen()} onPieceDrop={onDrop}></Chessboard>
     </div>
-    <br></br>
     <p>{loading ? "Calculating..." : "Make your move"}</p>
     {error && <>
       <p>An error occured, please try again</p>
       <button onClick={initOpponentMove}>Try again</button></>}
+    <div className="mt-5">
+      {moveLog.slice().reverse().map((move, index) =>
+        <div key={index} className="flex justify-between border-2 rounded mx-5 px-5 py-2 my-2">
+          <span>
+            {move.split(":")[0]}
+          </span>
+          <span>
+            {move.split(":")[1]}
+          </span>
+        </div>
+      )}
+    </div>
   </div>
 };
 

@@ -1,4 +1,4 @@
-export default async function getNewFEN(fen: string, aiDepth: number): Promise<string> {
+export default async function requestMove(fen: string, aiDepth: number): Promise<any> {
     var formdata = new FormData();
     formdata.append("fen", fen);
     formdata.append("depth", Math.floor(aiDepth).toString())
@@ -14,5 +14,5 @@ export default async function getNewFEN(fen: string, aiDepth: number): Promise<s
         redirect: 'follow'
     };
     const response = await fetch('https://chess-ai-api.herokuapp.com/nextmove', requestOptions).then((value) => value.json())
-    return response.updatedFEN
+    return response
 }
