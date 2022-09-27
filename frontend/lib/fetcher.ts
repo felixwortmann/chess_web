@@ -13,6 +13,10 @@ export default async function requestMove(fen: string, aiDepth: number): Promise
         mode: 'cors',
         redirect: 'follow'
     };
-    const response = await fetch('https://chess-ai-api.herokuapp.com/nextmove', requestOptions).then((value) => value.json())
+    const url = process.env.API_HOST ? "http://" + process.env.API_HOST + ":5000/nextmove" : 'https://chess-ai-api.herokuapp.com/nextmove'
+    const response = await fetch(url, requestOptions).then((value) => value.json())
     return response
 }
+
+
+
